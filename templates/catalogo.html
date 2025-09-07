@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if is_search_results %}
+        Resultados para "{{ query }}"
+    {% else %}
+        Catálogo de Productos
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Nuestro Catálogo</h1>
+        <p class="lead text-muted">Explora nuestras categorías o busca un producto específico.</p>
+    </div>
+
+    <!-- Barra de búsqueda general -->
+    <form action="{% url 'catalogo:catalogo' %}" method="get" class="mb-5">
+        <div class="input-group">
+            <input type="text" class="form-control" name="q" placeholder="Buscar en toda la tienda..." value="{{ query|default:'' }}">
+            <button class="btn btn-success" type="submit"><i class="bi bi-search"></i> Buscar</button>
+        </div>
+    </form>
+
+    {% if is_search_results %}
+        <!-- **VISTA DE RESULTADOS DE BÚSQUEDA** -->
+        <h2 class="pb-2 border-bottom mb-4">Resultados para: "{{ query }}"</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for producto in productos %}
+                <div class="col">
+                    <a href="{% url 'catalogo:producto_detalle' producto.id %}" class="text-decoration-none text-dark">
+                        <div class="card h-100 shadow-sm">
+                            {% if producto.imagen and producto.imagen.url %}
+                                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: cover; filter: grayscale(80%);">
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">{{ producto.nombre|truncatechars:50 }}</h5>
+                                <div class="mt-auto">
+                                    <h4 class="card-text text-end text-success fw-bold">${{ producto.precio }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center" role="alert">
+                        No se encontraron productos con el nombre "{{ query }}".
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <!-- Paginación para resultados de búsqueda -->
+        {% if productos.has_other_pages %}
+        <nav aria-label="Navegación de productos" class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if productos.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?q={{ query }}&page={{ productos.previous_page_number }}">Anterior</a></li>
+                {% endif %}
+                <li class="page-item disabled"><span class="page-link">Página {{ productos.number }} de {{ productos.paginator.num_pages }}</span></li>
+                {% if productos.has_next %}
+                    <li class="page-item"><a class="page-link" href="?q={{ query }}&page={{ productos.next_page_number }}">Siguiente</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <!-- **VISTA DE CATEGORÍAS** -->
+        <h2 class="pb-2 border-bottom mb-4">Nuestras Categorías</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for item in datos_categorias %}
+                <div class="col">
+                    <a href="{% url 'catalogo:categoria_detalle' item.categoria.id %}" class="text-decoration-none text-dark">
+                        <div class="card h-100 shadow-sm category-card">
+                            {% if item.primer_producto and item.primer_producto.imagen %}
+                                <img src="{{ item.primer_producto.imagen.url }}" class="card-img-top" alt="Imagen de {{ item.categoria.nombre }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: cover; filter: grayscale(80%);">
+                            {% endif %}
+                            <div class="card-body text-center">
+                                <h5 class="card-title fw-bold">{{ item.categoria.nombre }}</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center" role="alert">
+                        Aún no hay categorías para mostrar.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- Los estilos de hover ya están en base.html, por lo que el bloque <style> anterior se puede eliminar. -->
+{% endblock %}

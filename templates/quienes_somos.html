@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Quiénes Somos{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Sobre Nosotros</h1>
+        <p class="lead text-muted">Conoce más sobre Ferre Hogar Chuchin.</p>
+    </div>
+
+    <div class="row g-5">
+        <div class="col-lg-6">
+            <h2 class="pb-2 border-bottom">¿Quiénes Somos?</h2>
+            
+            <!-- **IMAGEN AÑADIDA** -->
+            <!-- Nota: Debes agregar una imagen llamada 'sobre-nosotros.jpg' en tu carpeta 'static/img/' -->
+            <img src="{% static 'img/sobre-nosotros.jpg' %}" class="img-fluid rounded shadow-sm mb-4" alt="Interior de la ferretería Ferre Hogar Chuchin">
+
+            <p>En nuestra ferretería trabajamos día a día para ofrecerte refacciones, herramientas y accesorios de la mejor calidad. Contamos con una gran variedad de productos: mezcladoras, regaderas, propelas, transmisiones, válvulas, perillas, piezas para licuadoras, kits de instalación para climas, gas refrigerante, bombas de agua, rotomartillos, esmeriladoras y mucho más.</p>
+            <p>Nos especializamos en brindarte variedad de marcas, modelos y precios accesibles, siempre con la confianza y atención que nos caracteriza. Queremos ser tu primera opción cuando pienses en soluciones para el hogar, la refrigeración y la ferretería en general.</p>
+
+            <h2 class="mt-4 pb-2 border-bottom">Nuestra Misión</h2>
+            <p>Nuestra misión es proveer a la comunidad con productos de ferretería y refacciones confiables, que ayuden a mantener en óptimas condiciones el hogar y los equipos de cada cliente. Más que vender, buscamos ser tu aliado de confianza, ofreciéndote calidad, variedad y precios justos en un solo lugar.</p>
+
+        </div>
+        <div class="col-lg-6">
+            <h2 class="pb-2 border-bottom">Nuestra Ubicación y Contacto</h2>
+            <p><i class="bi bi-geo-alt-fill me-2"></i><strong>Dirección:</strong> Av. Vicente Guerrero 2121 y 2134, Col. Vicente Guerrero, C.P. 91700, Veracruz, Ver.</p>
+            <ul class="list-unstyled">
+                <li><i class="bi bi-telephone-fill me-2"></i><strong>Teléfono / WhatsApp:</strong> +52 229 188 3340</li>
+                <li><i class="bi bi-envelope-fill me-2"></i><strong>Correo:</strong> ferrehogarchuchin@gmail.com</li>
+            </ul>
+            <div class="ratio ratio-16x9 mt-3">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3768.019557343419!2d-96.15939962575402!3d19.2376889467687!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85c34752c8068947%3A0x74ef49f7d457732c!2sFerre%20Hogar%20Chuchin!5e0!3m2!1ses-419!2smx!4v1717625595633!5m2!1ses-419!2smx" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

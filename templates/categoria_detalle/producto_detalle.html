@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ producto.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Columna de la Imagen -->
+        <div class="col-md-6">
+            {% if producto.imagen and producto.imagen.url %}
+                <img src="{{ producto.imagen.url }}" class="img-fluid rounded shadow-sm" alt="{{ producto.nombre }}">
+            {% else %}
+                <img src="{% static 'img/placeholder.png' %}" class="img-fluid rounded shadow-sm" alt="Imagen no disponible">
+            {% endif %}
+        </div>
+
+        <!-- Columna de la Información -->
+        <div class="col-md-6">
+            <h1 class="display-5">{{ producto.nombre }}</h1>
+            <p class="lead text-muted">{{ producto.categoria.nombre }}</p>
+            
+            <h2 class="text-success fw-bold my-4">${{ producto.precio }}</h2>
+            
+            <h4>Descripción</h4>
+            <p>{{ producto.descripcion|linebreaks }}</p>
+            
+            <ul class="list-group list-group-flush mt-4">
+                <li class="list-group-item"><strong>Stock disponible:</strong> {{ producto.stock }} unidades</li>
+                <!-- Puedes agregar más especificaciones aquí -->
+            </ul>
+
+            <div class="mt-4">
+                <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+                <!-- Opcional: Botón para contactar por WhatsApp -->
+                <a href="https://wa.me/522291883340?text=Hola,%20me%20interesa%20el%20producto:%20{{ producto.nombre }}" target="_blank" class="btn btn-success">
+                    <i class="bi bi-whatsapp"></i> Consultar por WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

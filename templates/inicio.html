@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bienvenido a Ferretería "El Tornillo Feliz"{% endblock %}
+
+{% block content %}
+<!-- =========================
+Sección Hero (Banner Principal)
+============================== -->
+<div class="container-fluid p-0 mb-5">
+    <div class="position-relative">
+        <!-- **NOTA:** Debes agregar una imagen llamada 'banner-ferreteria.jpg' en tu carpeta 'static/img/' -->
+        <img src="{% static 'img/banner-ferreteria.jpg' %}" class="img-fluid w-100" alt="Banner de Ferretería" style="object-fit: cover; height: 400px; background-color: #333;">
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(0, 0, 0, 0.5);">
+            <div class="container text-white">
+                <h1 class="display-3 fw-bold">Tu proyecto empieza aquí</h1>
+                <p class="lead col-lg-8">Encuentra todo lo que necesitas para tu hogar, todo al alcance de tus manos</p>
+                <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success btn-lg">Explorar Catálogo</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- =========================
+    Barra de Búsqueda
+    ============================== -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-8">
+            <h2 class="text-center mb-4">¿Qué estás buscando?</h2>
+            <form action="{% url 'catalogo:catalogo' %}" method="get">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" name="q" placeholder="Ej: Taladro, martillo, cemento...">
+                    <button class="btn btn-success" type="submit"><i class="bi bi-search"></i> Buscar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =========================
+    Productos Destacados por Categoría
+    ============================== -->
+    {% for data in datos_por_categoria %}
+    <div class="mb-5">
+        <h2 class="pb-2 border-bottom">{{ data.categoria.nombre }}</h2>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 mt-2">
+            {% for producto in data.productos %}
+            <div class="col">
+                <a href="{% url 'catalogo:producto_detalle' producto.id %}" class="text-decoration-none text-dark">
+                    <div class="card h-100 shadow-sm">
+                        {% if producto.imagen and producto.imagen.url %}
+                            <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 180px; object-fit: cover; filter: grayscale(80%);">
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title flex-grow-1">{{ producto.nombre|truncatechars:40 }}</h6>
+                            <div class="mt-auto">
+                                <p class="card-text text-end text-success fw-bold fs-5">${{ producto.precio }}</p>
+                            </div>
+                        </div>
+                     </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% empty %}
+        <div class="alert alert-light text-center" role="alert">
+            <p class="h4">¡Pronto tendremos productos destacados!</p>
+            <p>Mientras tanto, puedes explorar nuestro catálogo completo.</p>
+            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-primary">Ir al Catálogo</a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
