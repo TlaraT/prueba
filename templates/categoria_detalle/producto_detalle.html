@@ -9,9 +9,11 @@
         <!-- Columna de la Imagen -->
         <div class="col-md-6">
             {% if producto.imagen and producto.imagen.url %}
+                <!-- Eliminamos el estilo que forzaba la altura y recortaba la imagen. -->
+                <!-- La clase 'img-fluid' de Bootstrap se encarga de que se vea bien y sin deformarse. -->
                 <img src="{{ producto.imagen.url }}" class="img-fluid rounded shadow-sm" alt="{{ producto.nombre }}">
             {% else %}
-                <img src="{% static 'img/placeholder.png' %}" class="img-fluid rounded shadow-sm" alt="Imagen no disponible">
+                <img src="{% static 'img/placeholder.png' %}" class="img-fluid rounded shadow-sm" alt="Imagen no disponible" style="max-height: 400px; filter: grayscale(80%);">
             {% endif %}
         </div>
 
@@ -29,6 +31,52 @@
                 <li class="list-group-item"><strong>Stock disponible:</strong> {{ producto.stock }} unidades</li>
                 <!-- Puedes agregar más especificaciones aquí -->
             </ul>
+
+            <!-- =====================================================
+            SECCIÓN DE REFACCIONES
+            Muestra los productos que este producto tiene como refacciones.
+            Ej: Si estás viendo una "Licuadora", aquí aparecerán sus "Cuchillas".
+            ====================================================== -->
+            {% if producto.accesorios.all %}
+            <div class="mt-5">
+                <h4 class="pb-2 border-bottom">Refacciones</h4>
+                <div class="row row-cols-2 row-cols-md-3 g-3 mt-2">
+                    {% for accesorio in producto.accesorios.all %}
+                    <div class="col">
+                        <a href="{% url 'catalogo:producto_detalle' accesorio.id %}" class="text-decoration-none text-dark">
+                            <div class="card h-100 shadow-sm">
+                                {% if accesorio.imagen and accesorio.imagen.url %}
+                                    <img src="{{ accesorio.imagen.url }}" class="card-img-top" alt="{{ accesorio.nombre }}" style="height: 100px; object-fit: contain; background-color: #f8f9fa;">
+                                {% else %}
+                                    <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 100px; object-fit: contain; filter: grayscale(80%); background-color: #f8f9fa;">
+                                {% endif %}
+                                <div class="card-body p-2 text-center d-flex flex-column">
+                                    <h6 class="card-title small flex-grow-1">{{ accesorio.nombre|truncatechars:30 }}</h6>
+                                    <p class="card-text text-success fw-bold mb-0 mt-auto">${{ accesorio.precio }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- =====================================================
+            SECCIÓN DE COMPATIBILIDAD
+            Muestra con qué productos principales es compatible esta refacción.
+            Ej: Si estás viendo "Cuchillas", aquí aparecerá "Vaso de Licuadora".
+            ====================================================== -->
+            {% if producto.producto_principal.all %}
+            <div class="mt-5">
+                <h4 class="pb-2 border-bottom">Compatible con</h4>
+                <ul class="list-group list-group-flush">
+                {% for principal in producto.producto_principal.all %}
+                    <li class="list-group-item"><a href="{% url 'catalogo:producto_detalle' principal.id %}">{{ principal.nombre }}</a></li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
             <div class="mt-4">
                 <a href="javascript:history.back()" class="btn btn-outline-secondary">

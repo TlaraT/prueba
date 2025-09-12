@@ -56,7 +56,15 @@ def catalogo(request):
                 'categoria': categoria,
                 'primer_producto': primer_producto
             })
-        context = {'is_search_results': False, 'datos_categorias': datos_categorias}
+
+        # Obtenemos algunos productos con stock para mostrar (los 8 más recientes)
+        productos_en_stock = Producto.objects.filter(stock__gt=0).order_by('-id')[:8]
+
+        context = {
+            'is_search_results': False, 
+            'datos_categorias': datos_categorias,
+            'productos_en_stock': productos_en_stock
+        }
         return render(request, 'catalogo.html', context)
 
 def categoria_detalle(request, categoria_id):
@@ -84,7 +92,11 @@ def categoria_detalle(request, categoria_id):
     return render(request, 'categoria_detalle/categoria_detalle.html', context)
 
 def producto_detalle(request, producto_id):
-    producto = get_object_or_404(Producto, id=producto_id)
+    # Usamos prefetch_related para cargar eficientemente los accesorios y los productos principales
+    # en una sola consulta adicional, evitando el problema N+1.
+    producto = get_object_or_404(
+        Producto.objects.prefetch_related('accesorios', 'producto_principal'), 
+        id=producto_id)
     context = {
         'producto': producto
     }

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Bienvenido a Ferretería "El Tornillo Feliz"{% endblock %}
+{% block title %}Inicio - Ferre Hogar Chuchin{% endblock %}
 
 {% block content %}
 <!-- =========================
@@ -49,9 +49,9 @@ Sección Hero (Banner Principal)
                 <a href="{% url 'catalogo:producto_detalle' producto.id %}" class="text-decoration-none text-dark">
                     <div class="card h-100 shadow-sm">
                         {% if producto.imagen and producto.imagen.url %}
-                            <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 180px; object-fit: cover;">
+                            <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 180px; object-fit: contain; background-color: #f8f9fa;">
                         {% else %}
-                            <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 180px; object-fit: cover; filter: grayscale(80%);">
+                            <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 180px; object-fit: contain; filter: grayscale(80%); background-color: #f8f9fa;">
                         {% endif %}
                         <div class="card-body d-flex flex-column">
                             <h6 class="card-title flex-grow-1">{{ producto.nombre|truncatechars:40 }}</h6>

@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-i91#vsm%p1^ek+pjw=(&1(_(0u&#x_ets62i*7__+e8_l7k4b8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['8759bcc71cc0.ngrok-free.app', '127.0.0.1']
+# El host de ngrok cambia cada vez que lo inicias (en la versión gratuita).
+# Debes actualizarlo con el que te da la terminal de ngrok.
+# Ejemplo: si ngrok te da 'https://9a1b-cdef-3456.ngrok-free.app', pones '9a1b-cdef-3456.ngrok-free.app' aquí.
+ALLOWED_HOSTS = ['f621eb581232.ngrok-free.app', '127.0.0.1', 'localhost']
 
 
 

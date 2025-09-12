@@ -4,7 +4,7 @@ from django.contrib import admin
 from .models import Categoria, Producto, Empleado
 from import_export import resources
 from import_export.fields import Field
-from import_export.widgets import ForeignKeyWidget, Widget
+from import_export.widgets import ForeignKeyWidget, Widget, ManyToManyWidget
 from import_export.admin import ImportExportModelAdmin
 from django.conf import settings
 import os
@@ -57,33 +57,25 @@ class ProductoResource(resources.ModelResource):
         attribute='imagen',
         widget=ImageWidget()
     )
+    # --- CAMPO AJUSTADO PARA MANEJAR REFACCIONES ---
+    # La columna en el Excel se llamará 'refacciones', pero internamente
+    # seguirá apuntando al campo 'accesorios' del modelo.
+    refacciones = Field(
+        column_name='refacciones',
+        attribute='accesorios', # Esto no se cambia, es el nombre interno del campo.
+        widget=ManyToManyWidget(Producto, field='nombre', separator=',')
+    )
 
     class Meta:
         model = Producto
-        fields = ('nombre', 'descripcion', 'precio', 'categoria', 'imagen', 'stock', 'es_mas_vendido')
+        fields = ('nombre', 'descripcion', 'precio', 'categoria', 'imagen', 'stock', 'es_mas_vendido', 'refacciones')
         import_id_fields = ('nombre',)  # Usa 'nombre' como identificador único
         skip_unchanged = True
         report_skipped = False
-        create_missing_fk = True# catalogo/admin.py
-        
-        # ... (código anterior) ...
-        
-        class ProductoResource(resources.ModelResource): 
-            # ... (definición de campos) ...
-        
-            class Meta:
-                model = Producto
-                fields = ('nombre', 'descripcion', 'precio', 'categoria', 'imagen', 'stock', 'es_mas_vendido')
-                import_id_fields = ('nombre',)
-                skip_unchanged = True
-                report_skipped = False
-                create_missing_fk = True # <--- ¡ESTO ES CORRECTO!
-        
-        # ... (resto del código) ...
-        
         create_missing_fk = True
 
 class ProductoAdmin(ImportExportModelAdmin):
+    filter_horizontal = ('accesorios',)
     resource_class = ProductoResource
     list_display = ('nombre', 'precio', 'categoria', 'stock', 'es_mas_vendido')
     list_filter = ('categoria', 'es_mas_vendido', 'imagen')

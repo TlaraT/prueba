@@ -33,9 +33,9 @@
                     <a href="{% url 'catalogo:producto_detalle' producto.id %}" class="text-decoration-none text-dark">
                         <div class="card h-100 shadow-sm">
                             {% if producto.imagen and producto.imagen.url %}
-                                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 200px; object-fit: cover;">
+                                <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 200px; object-fit: contain; background-color: #f8f9fa;">
                             {% else %}
-                                <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: cover; filter: grayscale(80%);">
+                                <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: contain; filter: grayscale(80%); background-color: #f8f9fa;">
                             {% endif %}
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{ producto.nombre|truncatechars:50 }}</h5>
@@ -78,9 +78,9 @@
                     <a href="{% url 'catalogo:categoria_detalle' item.categoria.id %}" class="text-decoration-none text-dark">
                         <div class="card h-100 shadow-sm category-card">
                             {% if item.primer_producto and item.primer_producto.imagen %}
-                                <img src="{{ item.primer_producto.imagen.url }}" class="card-img-top" alt="Imagen de {{ item.categoria.nombre }}" style="height: 200px; object-fit: cover;">
+                                <img src="{{ item.primer_producto.imagen.url }}" class="card-img-top" alt="Imagen de {{ item.categoria.nombre }}" style="height: 200px; object-fit: contain; background-color: #f8f9fa;">
                             {% else %}
-                                <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: cover; filter: grayscale(80%);">
+                                <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: contain; filter: grayscale(80%); background-color: #f8f9fa;">
                             {% endif %}
                             <div class="card-body text-center">
                                 <h5 class="card-title fw-bold">{{ item.categoria.nombre }}</h5>
@@ -96,6 +96,34 @@
                 </div>
             {% endfor %}
         </div>
+
+        <!-- **NUEVA SECCIÓN: PRODUCTOS EN STOCK** -->
+        {% if productos_en_stock %}
+        <div class="mt-5">
+            <h2 class="pb-2 border-bottom mb-4">Productos en Stock</h2>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for producto in productos_en_stock %}
+                    <div class="col">
+                        <a href="{% url 'catalogo:producto_detalle' producto.id %}" class="text-decoration-none text-dark">
+                            <div class="card h-100 shadow-sm">
+                                {% if producto.imagen and producto.imagen.url %}
+                                    <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 200px; object-fit: contain; background-color: #f8f9fa;">
+                                {% else %}
+                                    <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: contain; filter: grayscale(80%); background-color: #f8f9fa;">
+                                {% endif %}
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">{{ producto.nombre|truncatechars:50 }}</h5>
+                                    <div class="mt-auto">
+                                        <h4 class="card-text text-end text-success fw-bold">${{ producto.precio }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
     {% endif %}
 </div>
 

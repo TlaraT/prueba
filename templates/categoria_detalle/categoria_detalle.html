@@ -20,9 +20,10 @@
             <a href="{% url 'catalogo:producto_detalle' producto.id %}" class="text-decoration-none text-dark">
                 <div class="card h-100 shadow-sm">
                     {% if producto.imagen and producto.imagen.url %}
-                        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 200px; object-fit: cover;">
+                        <!-- 'object-fit: contain' asegura que la imagen completa se vea dentro del espacio asignado. -->
+                        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}" style="height: 200px; object-fit: contain; background-color: #f8f9fa;">
                     {% else %}
-                        <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: cover; filter: grayscale(80%);">
+                        <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 200px; object-fit: contain; filter: grayscale(80%); background-color: #f8f9fa;">
                     {% endif %}
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title">{{ producto.nombre|truncatechars:50 }}</h5>
