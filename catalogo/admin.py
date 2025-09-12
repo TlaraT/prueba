@@ -64,6 +64,24 @@ class ProductoResource(resources.ModelResource):
         import_id_fields = ('nombre',)  # Usa 'nombre' como identificador único
         skip_unchanged = True
         report_skipped = False
+        create_missing_fk = True# catalogo/admin.py
+        
+        # ... (código anterior) ...
+        
+        class ProductoResource(resources.ModelResource): 
+            # ... (definición de campos) ...
+        
+            class Meta:
+                model = Producto
+                fields = ('nombre', 'descripcion', 'precio', 'categoria', 'imagen', 'stock', 'es_mas_vendido')
+                import_id_fields = ('nombre',)
+                skip_unchanged = True
+                report_skipped = False
+                create_missing_fk = True # <--- ¡ESTO ES CORRECTO!
+        
+        # ... (resto del código) ...
+        
+        create_missing_fk = True
 
 class ProductoAdmin(ImportExportModelAdmin):
     resource_class = ProductoResource
