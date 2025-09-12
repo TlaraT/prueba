@@ -46,9 +46,9 @@
                         <a href="{% url 'catalogo:producto_detalle' accesorio.id %}" class="text-decoration-none text-dark">
                             <div class="card h-100 shadow-sm">
                                 {% if accesorio.imagen and accesorio.imagen.url %}
-                                    <img src="{{ accesorio.imagen.url }}" class="card-img-top" alt="{{ accesorio.nombre }}" style="height: 100px; object-fit: contain; background-color: #f8f9fa;">
+                                    <img src="{{ accesorio.imagen.url }}" class="card-img-top" alt="{{ accesorio.nombre }}" style="height: 100px; object-fit: contain; background-color: #f8f9fa;" loading="lazy" decoding="async">
                                 {% else %}
-                                    <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 100px; object-fit: contain; filter: grayscale(80%); background-color: #f8f9fa;">
+                                    <img src="{% static 'img/placeholder.png' %}" class="card-img-top" alt="Imagen no disponible" style="height: 100px; object-fit: contain; filter: grayscale(80%); background-color: #f8f9fa;" loading="lazy" decoding="async">
                                 {% endif %}
                                 <div class="card-body p-2 text-center d-flex flex-column">
                                     <h6 class="card-title small flex-grow-1">{{ accesorio.nombre|truncatechars:30 }}</h6>

@@ -85,6 +85,11 @@ class ProductoAdmin(ImportExportModelAdmin):
     save_on_top = True
     
 
+# --- PERSONALIZACIÓN DEL SITIO DE ADMINISTRACIÓN ---
+admin.site.site_header = "Administración de Ferre Hogar Chuchin"
+admin.site.site_title = "Portal de Administración"
+admin.site.index_title = "Bienvenido al portal de gestión"
+
 
 # 3. Registros: Activamos todo en el panel de admin.
 admin.site.register(Categoria)

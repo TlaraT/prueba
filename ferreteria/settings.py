@@ -78,10 +78,20 @@ WSGI_APPLICATION = 'ferreteria.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# --- CONFIGURACIÓN DE BASE DE DATOS PARA PRODUCCIÓN (PostgreSQL) ---
+# Reemplaza la configuración de SQLite por esta para usar PostgreSQL.
+# Asegúrate de reemplazar 'ferreteria_db', 'ferreteria_user' y 'tu_contraseña_segura'
+# con los valores correctos que creaste en tu servidor de base de datos.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ferreteria_db',
+        'USER': 'ferreteria_user',
+        'PASSWORD': 'tu_contraseña_segura',
+        'HOST': 'localhost', # O la IP del servidor de BD
+        'PORT': '5432',      # Puerto por defecto de PostgreSQL
     }
 }
 

@@ -48,13 +48,27 @@ def catalogo(request):
     
     else:
         # --- LÓGICA DE CATEGORÍAS (si no hay búsqueda) ---
+        # --- LÓGICA DE CATEGORÍAS OPTIMIZADA para evitar el problema N+1 ---
         categorias = Categoria.objects.all().order_by('nombre')
+        
+        # 1. Obtenemos todos los productos con imagen, ordenados por categoría, en una sola consulta.
+        productos_con_imagen = Producto.objects.filter(
+            categoria__in=categorias, 
+            imagen__isnull=False
+        ).order_by('categoria_id', 'id')
+
+        # 2. Creamos un mapa para guardar solo el primer producto de cada categoría (sin más consultas).
+        mapa_primer_producto = {}
+        for producto in productos_con_imagen:
+            if producto.categoria_id not in mapa_primer_producto:
+                mapa_primer_producto[producto.categoria_id] = producto
+
+        # 3. Construimos la lista final usando el mapa, de forma súper rápida.
         datos_categorias = []
         for categoria in categorias:
-            primer_producto = Producto.objects.filter(categoria=categoria, imagen__isnull=False).first()
             datos_categorias.append({
                 'categoria': categoria,
-                'primer_producto': primer_producto
+                'primer_producto': mapa_primer_producto.get(categoria.id)
             })
 
         # Obtenemos algunos productos con stock para mostrar (los 8 más recientes)
