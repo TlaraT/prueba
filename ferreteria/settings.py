@@ -26,7 +26,7 @@ DEBUG = True
 # El host de ngrok cambia cada vez que lo inicias (en la versión gratuita).
 # Debes actualizarlo con el que te da la terminal de ngrok.
 # Ejemplo: si ngrok te da 'https://9a1b-cdef-3456.ngrok-free.app', pones '9a1b-cdef-3456.ngrok-free.app' aquí.
-ALLOWED_HOSTS = ['ivanortiz24.pythonanywhere.com']
+ALLOWED_HOSTS = ['ivanortiz24.pythonanywhere.com','127.0.0.1','localhost']
 
 
 

@@ -12,45 +12,98 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <!-- **NUEVO** - Vinculamos nuestro CSS de categorías -->
+    <link rel="stylesheet" href="{% static 'css/categorias.css' %}">
+
     <!-- **BLOQUE DE ESTILOS MEJORADO** -->
     <style>
+        /* --- PALETA DE COLORES Y PERSONALIDAD --- */
         :root {
             --bs-success: #198754; /* Verde principal para fondos y elementos importantes */
             --verde-llamativo: #2ECC71; /* Verde brillante para botones y llamadas a la acción */
             --verde-claro: #E8F8F5; /* Un fondo muy sutil para cabeceras de tarjetas */
+            --gris-suave: #f8f9fa; /* Fondo general para un look más suave */
+            --sombra-suave: rgba(0, 0, 0, 0.05);
+            --sombra-fuerte: rgba(0, 0, 0, 0.15);
         }
 
-        /* --- Componentes Personalizados --- */
+        /* --- ESTILOS GENERALES Y ANIMACIONES --- */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--gris-suave);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* --- PRELOADER (SOLO PARA LA PÁGINA DE INICIO) --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fff; /* Fondo blanco para cubrir la página */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+            visibility: visible;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--gris-suave);
+            border-top-color: var(--bs-success); /* Color verde de la marca */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- COMPONENTES BOOTSTRAP PERSONALIZADOS --- */
         .navbar { background-color: var(--bs-success) !important; }
         .navbar .navbar-brand, .navbar .nav-link { color: white !important; }
 
-        /* Botones */
         .btn-success {
             background-color: var(--verde-llamativo);
             border-color: var(--verde-llamativo);
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
         .btn-success:hover {
             background-color: #27AE60; /* Tono ligeramente más oscuro para hover */
             border-color: #27AE60;
         }
 
-        /* Enlaces y Texto */
         .text-success { color: var(--bs-success) !important; }
         a { color: var(--bs-success); text-decoration: none; }
         a:hover { color: #146c43; } /* Verde más oscuro para hover de enlaces */
 
-        /* Tarjetas (Cards) */
-        .card-header { background-color: var(--verde-claro); }
+        /* --- TARJETAS DE PRODUCTO CON PERSONALIDAD --- */
         .card {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            border: 1px solid #dee2e6;
+            border: none; /* Sin bordes para un look más limpio */
+            border-radius: 0.5rem; /* Esquinas más suaves */
+            box-shadow: 0 4px 15px var(--sombra-suave);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15)!important;
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px var(--sombra-fuerte);
+        }
+        .card-img-top {
+            animation: fadeIn 0.5s ease-in-out;
         }
 
-        /* Paginación */
+        /* --- PAGINACIÓN Y OTROS --- */
         .pagination .page-item.active .page-link {
             background-color: var(--bs-success);
             border-color: var(--bs-success);
@@ -62,14 +115,36 @@
             color: #146c43;
         }
 
+        /* Estilo para el título de la categoría (ahora unificado) */
+        .category-title {
+            color: var(--bs-success);
+        }
+
         .card-img-top-custom {
             height: 200px;
             object-fit: cover;
         }
     </style>
+    
+    <style>
+        /* --- ANIMACIÓN DE ENTRADA PARA EL CONTENIDO PRINCIPAL --- */
+        main {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+    </style>
+
+    {# Este bloque permite a las plantillas hijas (como categoria_detalle.html) añadir sus propios estilos CSS #}
+    {% block extra_styles %}{% endblock %}
 </head>
 
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column h-100 {% block body_class %}{% endblock %}">
+
+    {# --- PRELOADER HTML (SOLO SE MUESTRA EN LA PÁGINA DE INICIO) --- #}
+    {% if request.resolver_match.url_name == 'inicio' %}
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+    {% endif %}
 
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
@@ -136,5 +211,17 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {# --- SCRIPT PARA MANEJAR EL PRELOADER --- #}
+    <script>
+        window.addEventListener('load', function() {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                // Oculta el preloader cuando la página ha cargado completamente
+                preloader.classList.add('hidden');
+            }
+        });
+    </script>
+
 </body>
 </html>
