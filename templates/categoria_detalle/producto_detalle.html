@@ -7,13 +7,19 @@
 <div class="container my-5">
     <div class="row">
         <!-- Columna de la Imagen -->
-        <div class="col-md-6">
+        <div class="col-md-6 position-relative">
             {% if producto.imagen and producto.imagen.url %}
-                <!-- Eliminamos el estilo que forzaba la altura y recortaba la imagen. -->
-                <!-- La clase 'img-fluid' de Bootstrap se encarga de que se vea bien y sin deformarse. -->
-                <img src="{{ producto.imagen.url }}" class="img-fluid rounded shadow-sm" alt="{{ producto.nombre }}">
+                <!-- Contenedor para el efecto de zoom -->
+                <div class="img-zoom-container">
+                    <img id="product-image" src="{{ producto.imagen.url }}" class="img-fluid rounded shadow-sm" alt="{{ producto.nombre }}">
+                </div>
+                <!-- Div donde se mostrará la imagen ampliada. Se posicionará con CSS. -->
+                <div id="zoom-result" class="img-zoom-result shadow-lg rounded"></div>
             {% else %}
-                <img src="{% static 'img/placeholder.png' %}" class="img-fluid rounded shadow-sm" alt="Imagen no disponible" style="max-height: 400px; filter: grayscale(80%);">
+                <div class="img-zoom-container">
+                    <img id="product-image" src="{% static 'img/placeholder.png' %}" class="img-fluid rounded shadow-sm" alt="Imagen no disponible" style="max-height: 400px; filter: grayscale(80%);">
+                </div>
+                <!-- No mostramos el resultado del zoom para la imagen placeholder -->
             {% endif %}
         </div>
 
@@ -90,4 +96,113 @@
         </div>
     </div>
 </div>
+
+<!-- =====================================================
+SCRIPT Y ESTILOS PARA EL ZOOM DE LA IMAGEN
+====================================================== -->
+<style>    
+    .img-zoom-container {
+        position: relative;
+        /* Ocultamos el cursor normal para reemplazarlo por la lupa */
+        cursor: none;
+    }
+
+    /* El lente guía ya no es necesario para este efecto */
+    .img-zoom-lens {
+        display: none !important;
+    }
+
+    .img-zoom-result {
+        /* Estilo de la lupa circular */
+        border: 3px solid #198754; /* Borde verde a juego con la marca */
+        border-radius: 50%; /* ¡La clave para que sea un círculo! */
+        width: 200px;
+        height: 200px;
+        position: absolute;
+        /* La posición (top/left) será controlada por JavaScript */
+        pointer-events: none; /* Evita que la lupa interfiera con los eventos del ratón */
+        display: none; /* Oculto por defecto */
+        z-index: 100;        
+        background-repeat: no-repeat;
+    }
+
+    /* Ocultar el zoom en pantallas pequeñas para no tapar el contenido */
+    @media (max-width: 767.98px) {
+        .img-zoom-result {
+            display: none !important;
+        }
+        .img-zoom-container {
+            cursor: zoom-in; /* En móvil, volvemos al cursor normal */
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Solo ejecutar el script si existe la imagen del producto
+    const productImage = document.getElementById('product-image');
+    if (!productImage || !productImage.closest('.img-zoom-container')) return;
+
+    // Evitar que el script se ejecute en pantallas pequeñas
+    if (window.innerWidth < 768) return;
+
+    imageZoom("product-image", "zoom-result");
+});
+
+function imageZoom(imgID, resultID) {
+    const img = document.getElementById(imgID);
+    // Esperar a que la imagen principal se cargue para obtener sus dimensiones correctas
+    img.addEventListener('load', function() {
+        const result = document.getElementById(resultID);
+        const container = img.parentElement;
+        let zoomFactor;
+
+        // --- AJUSTE CLAVE ---
+        // Definimos un factor de zoom. Un valor de 2 significa un zoom del 200%.
+        // Puedes cambiar este valor (ej. 2.5 o 3) para un zoom más o menos potente.
+        zoomFactor = 2.5;
+
+        // Establecer el fondo del resultado del zoom y su tamaño
+        result.style.backgroundImage = "url('" + img.src + "')";
+        // El tamaño del fondo es el tamaño de la imagen en pantalla multiplicado por el factor de zoom.
+        result.style.backgroundSize = (img.width * zoomFactor) + "px " + (img.height * zoomFactor) + "px";
+
+        // Función para mover la lupa
+        const moveLupa = (e) => {
+            e.preventDefault();
+            const pos = getCursorPos(e);
+            
+            // Movemos el fondo de la imagen ampliada.
+            // La posición del fondo es la posición del cursor (no de la lupa) multiplicada por el zoom,
+            // menos la mitad del tamaño de la lupa para centrar el zoom.
+            const bgX = - (pos.x * zoomFactor - result.offsetWidth / 2);
+            const bgY = - (pos.y * zoomFactor - result.offsetHeight / 2);
+            result.style.backgroundPosition = `${bgX}px ${bgY}px`;
+
+            // --- CORRECCIÓN DE POSICIÓN DE LA LUPA ---
+            // Calculamos la posición de la lupa para que el cursor esté en su centro.
+            // Esto se hace DESPUÉS de calcular el fondo para que no haya dependencias incorrectas.
+            const lupaX = pos.x - (result.offsetWidth / 2);
+            const lupaY = pos.y - (result.offsetHeight / 2);
+
+            // Aplicamos la posición a la lupa
+            result.style.left = lupaX + "px";
+            result.style.top = lupaY + "px";
+        };
+
+        const getCursorPos = (e) => {
+            const a = img.getBoundingClientRect();
+            // Coordenadas del cursor relativas a la imagen
+            const x = e.pageX - a.left - window.pageXOffset;
+            const y = e.pageY - a.top - window.pageYOffset;
+            return { x: x, y: y };
+        };
+
+        // Añadimos los listeners para mostrar, ocultar y mover el zoom
+        container.addEventListener("mousemove", moveLupa);
+        container.addEventListener("mouseenter", () => { result.style.display = 'block'; });
+        container.addEventListener("mouseleave", () => { result.style.display = 'none'; });
+    });
+}
+</script>
 {% endblock %}
