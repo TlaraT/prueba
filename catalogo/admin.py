@@ -7,6 +7,7 @@ from import_export.widgets import ForeignKeyWidget, Widget, ManyToManyWidget
 from import_export.admin import ImportExportModelAdmin
 from django.conf import settings
 import os
+from django.utils.text import slugify
 
 # --- WIDGET PERSONALIZADO PARA MANEJAR IMÁGENES ---
 class ImageWidget(Widget):
@@ -21,7 +22,11 @@ class ImageWidget(Widget):
         # --- LÓGICA MODIFICADA ---
         # La ruta en el Excel ya debe ser relativa a la carpeta 'media'.
         # Por ejemplo: 'productos_imagenes/lijas/000001.webp'
-        relative_path = str(value)
+        # Usamos slugify en cada parte de la ruta para asegurar consistencia
+        # y evitar problemas de mayúsculas/minúsculas o espacios.
+        parts = str(value).replace('\\', '/').split('/')
+        slug_parts = [slugify(part) if '.' not in part else part for part in parts]
+        relative_path = "/".join(slug_parts)
 
         # Construimos la ruta completa para verificar que el archivo físico existe
         full_path = os.path.join(settings.MEDIA_ROOT, relative_path)
