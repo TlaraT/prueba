@@ -67,12 +67,20 @@ class Producto(models.Model):
         if self.imagen:
             # Abrimos la imagen en memoria con Pillow
             img = Image.open(self.imagen)
+            
+            # --- NUEVO: Redimensionar la imagen si es muy grande ---
+            # Definimos un ancho máximo. 1200px es un buen valor para imágenes de producto.
+            max_width = 1200
+            if img.width > max_width:
+                # Calculamos el alto proporcional para no deformar la imagen
+                new_height = int((max_width / img.width) * img.height)
+                img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
 
             # Creamos un buffer en memoria para la nueva imagen
             buffer = BytesIO()
 
             # Guardamos la imagen en el buffer en formato WebP.
-            # `quality=80` es un buen balance entre calidad y tamaño.
+            # `quality=80` es un buen balance entre calidad y tamaño. `optimize=True` ayuda un poco más.
             img.save(buffer, format='WEBP', quality=80)
 
             # Obtenemos el nombre del archivo original sin la extensión
