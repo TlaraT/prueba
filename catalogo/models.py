@@ -6,6 +6,11 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
 import os
+# --- NUEVAS IMPORTACIONES PARA LA SEÑAL ---
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils.text import slugify
+from django.conf import settings
 
 class Empleado(models.Model):
     nombre = models.CharField(max_length=100)
@@ -93,3 +98,22 @@ class Producto(models.Model):
 
         # Finalmente, llamamos al método de guardado original.
         super().save(*args, **kwargs)
+
+# --- SEÑAL PARA CREAR CARPETAS AUTOMÁTICAMENTE ---
+@receiver(post_save, sender=Categoria)
+def crear_carpeta_categoria(sender, instance, created, **kwargs):
+    """
+    Se ejecuta después de guardar una Categoria.
+    Si la categoría es nueva (created=True), crea una carpeta para sus imágenes.
+    """
+    if created:
+        # 1. Limpiamos el nombre de la categoría para que sea un nombre de carpeta válido.
+        #    Ej: "Lijas y Abrasivos" -> "lijas-y-abrasivos"
+        nombre_carpeta = slugify(instance.nombre)
+
+        # 2. Construimos la ruta completa donde se creará la carpeta.
+        #    Ej: C:\Users\Bucky\Desktop\prueba\media\productos_imagenes\lijas-y-abrasivos
+        ruta_carpeta = os.path.join(settings.MEDIA_ROOT, 'productos_imagenes', nombre_carpeta)
+
+        # 3. Creamos la carpeta. `exist_ok=True` evita errores si la carpeta ya existe.
+        os.makedirs(ruta_carpeta, exist_ok=True)

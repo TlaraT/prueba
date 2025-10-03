@@ -18,11 +18,14 @@ class ImageWidget(Widget):
         if not value:
             return None  # Si la celda está vacía, no hacemos nada
 
-        # Construimos la ruta relativa que Django guardará en la base de datos
-        relative_path = os.path.join('productos_imagenes', str(value))
+        # --- LÓGICA MODIFICADA ---
+        # La ruta en el Excel ya debe ser relativa a la carpeta 'media'.
+        # Por ejemplo: 'productos_imagenes/lijas/000001.webp'
+        relative_path = str(value)
+
         # Construimos la ruta completa para verificar que el archivo físico existe
         full_path = os.path.join(settings.MEDIA_ROOT, relative_path)
-
+        
         if not os.path.exists(full_path):
             raise ValueError(f"La imagen '{value}' no se encontró. Súbela a la carpeta 'media/productos_imagenes/' antes de importar.")
         
