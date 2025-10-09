@@ -28,10 +28,15 @@ Sección Hero (Banner Principal)
     <div class="row justify-content-center mb-5">
         <div class="col-md-8">
             <h2 class="text-center mb-4">¿Qué estás buscando?</h2>
-            <form action="{% url 'catalogo:catalogo' %}" method="get">
+            <!-- Contenedor relativo para posicionar la lista de sugerencias -->
+            <form action="{% url 'catalogo:catalogo' %}" method="get" class="position-relative">
                 <div class="input-group input-group-lg">
-                    <input type="text" class="form-control" name="q" placeholder="Ej: Taladro, martillo, cemento...">
+                    <!-- Añadimos un ID al input para identificarlo con JS -->
+                    <input type="text" class="form-control" id="search-input" name="q" placeholder="Ej: Taladro, martillo, cemento..." autocomplete="off">
                     <button class="btn btn-success" type="submit"><i class="bi bi-search"></i> Buscar</button>
+                </div>
+                <!-- Div donde se mostrarán las sugerencias -->
+                <div id="suggestions-box" class="list-group position-absolute w-100" style="z-index: 1000;">
                 </div>
             </form>
         </div>
@@ -73,4 +78,54 @@ Sección Hero (Banner Principal)
         </div>
     {% endfor %}
 </div>
+
+<!-- =========================
+Script para Autocompletado
+============================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-input');
+    const suggestionsBox = document.getElementById('suggestions-box');
+    const searchForm = searchInput.closest('form');
+
+    searchInput.addEventListener('input', function() {
+        const term = this.value;
+
+        if (term.length < 2) {
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        // Usamos la URL que creamos en Django
+        fetch(`{% url 'catalogo:search_suggestions' %}?term=${term}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestionsBox.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        // Creamos un enlace por cada sugerencia
+                        const suggestionItem = document.createElement('a');
+                        suggestionItem.href = item.url;
+                        suggestionItem.className = 'list-group-item list-group-item-action';
+                        suggestionItem.textContent = item.label;
+                        suggestionsBox.appendChild(suggestionItem);
+                    });
+                    suggestionsBox.style.display = 'block';
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+    });
+
+    // Ocultar sugerencias si se hace clic fuera del área de búsqueda
+    document.addEventListener('click', function(e) {
+        if (!searchForm.contains(e.target)) {
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
+        }
+    });
+});
+</script>
+
 {% endblock %}

@@ -48,10 +48,15 @@
     </div>
 
     <!-- Barra de búsqueda general -->
-    <form action="{% url 'catalogo:catalogo' %}" method="get" class="mb-5 w-75 mx-auto search-bar">
+    <!-- Añadimos position-relative para el contenedor de sugerencias -->
+    <form action="{% url 'catalogo:catalogo' %}" method="get" class="mb-5 w-75 mx-auto search-bar position-relative">
         <div class="input-group">
-            <input type="text" class="form-control" name="q" placeholder="¿Qué estás buscando hoy?" value="{{ query|default:'' }}">
+            <!-- Añadimos un ID y autocomplete="off" -->
+            <input type="text" class="form-control" id="catalog-search-input" name="q" placeholder="¿Qué estás buscando hoy?" value="{{ query|default:'' }}" autocomplete="off">
             <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i> Buscar</button>
+        </div>
+        <!-- Div donde se mostrarán las sugerencias -->
+        <div id="catalog-suggestions-box" class="list-group position-absolute w-100" style="z-index: 1000;">
         </div>
     </form>
 
@@ -173,4 +178,54 @@
         {% endif %}
     {% endif %}
 </div>
+
+<!-- =========================
+Script para Autocompletado
+============================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Apuntamos a los nuevos IDs de la barra de búsqueda del catálogo
+    const searchInput = document.getElementById('catalog-search-input');
+    const suggestionsBox = document.getElementById('catalog-suggestions-box');
+    const searchForm = searchInput.closest('form');
+
+    searchInput.addEventListener('input', function() {
+        const term = this.value;
+
+        if (term.length < 2) {
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
+            return;
+        }
+
+        // La URL de la vista de Django es la misma, ¡reutilizamos el backend!
+        fetch(`{% url 'catalogo:search_suggestions' %}?term=${term}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestionsBox.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const suggestionItem = document.createElement('a');
+                        suggestionItem.href = item.url;
+                        suggestionItem.className = 'list-group-item list-group-item-action';
+                        suggestionItem.textContent = item.label;
+                        suggestionsBox.appendChild(suggestionItem);
+                    });
+                    suggestionsBox.style.display = 'block';
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+    });
+
+    // Ocultar sugerencias si se hace clic fuera del área de búsqueda
+    document.addEventListener('click', function(e) {
+        if (!searchForm.contains(e.target)) {
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
+        }
+    });
+});
+</script>
+
 {% endblock %}

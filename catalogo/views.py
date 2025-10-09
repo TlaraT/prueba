@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Producto, Categoria
 from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.urls import reverse
 from collections import defaultdict
 
 def inicio(request):
@@ -118,6 +120,27 @@ def producto_detalle(request, producto_id):
     
 def quienes_somos(request):
     return render(request, 'quienes_somos.html')
+
+def contacto(request):
+    return render(request, 'contacto.html')
+
+# --- NUEVA VISTA PARA AUTOCOMPLETADO ---
+def search_suggestions(request):
+    """
+    Vista que devuelve sugerencias de productos en formato JSON
+    para la funcionalidad de autocompletado.
+    """
+    term = request.GET.get('term', '').strip()
+    suggestions = []
+    if len(term) >= 2: # Empezar a buscar a partir de 2 caracteres
+        productos = Producto.objects.filter(nombre__icontains=term)[:10] # Limitar a 10 resultados
+        for producto in productos:
+            suggestions.append({
+                'label': producto.nombre,
+                'url': reverse('catalogo:producto_detalle', args=[producto.id])
+            })
+    
+    return JsonResponse(suggestions, safe=False)
 
 def contacto(request):
     return render(request, 'contacto.html')

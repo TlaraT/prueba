@@ -23,5 +23,8 @@ urlpatterns = [
     path('contacto/', views.contacto, name='contacto'), 
     # Ruta para ver los detalles de un producto específico
     path('producto/<int:producto_id>/', views.producto_detalle, name='producto_detalle'),
+
+    # --- NUEVA RUTA PARA SUGERENCIAS DE BÚSQUEDA ---
+    path('search-suggestions/', views.search_suggestions, name='search_suggestions'),
 ]
   # --- IGNORE ---
