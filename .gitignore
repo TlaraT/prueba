@@ -1,0 +1,7 @@
+# Archivos de base de datos
+db.sqlite3
+# Archivos generados por Python
+
+# Archivos generados por Python
+__pycache__/
+*.pyc
