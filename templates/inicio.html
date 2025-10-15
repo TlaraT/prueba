@@ -7,20 +7,139 @@
 <!-- =========================
 Sección Hero (Banner Principal)
 ============================== -->
-<div class="container-fluid p-0 mb-5">
-    <div class="position-relative">
-        <!-- **NOTA:** Debes agregar una imagen llamada 'banner-ferreteria.jpg' en tu carpeta 'static/img/' -->
-        <img src="{% static 'img/banner-ferreteria-_1_.webp' %}" class="img-fluid w-100" alt="Banner de Ferretería" style="object-fit: cover; height: 400px; background-color: #333;">
-        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center" style="background: rgba(0, 0, 0, 0.5);">
-            <div class="container text-white">
-                <h1 class="display-3 fw-bold">Tu proyecto empieza aquí</h1>
-                <p class="lead col-lg-8">Encuentra todo lo que necesitas para tu hogar, todo al alcance de tus manos</p>
-                <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success btn-lg">Explorar Catálogo</a>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- **NUEVO:** CSS de Splide.js. Idealmente, esto iría en el <head> de tu 'base.html' -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+<!-- **NUEVO:** Fuentes de Google para un estilo más llamativo. Idealmente, esto iría en el <head> de tu 'base.html' -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400&family=Poppins:wght@700&display=swap" rel="stylesheet">
 
+<!-- Contenedor principal de Splide.js -->
+<section class="splide hero-splide mb-5" aria-label="Carrusel de bienvenida">
+    <div class="splide__track">
+        <ul class="splide__list">
+            <!-- Slide 1 -->
+            <li class="splide__slide">
+                <img src="{% static 'img/AMARILLO2.png' %}" class="hero-slide-img" alt="Herramientas variadas">
+                <div class="splide-caption">
+                    <div class="container text-white">
+                        <div class="col-lg-8">
+                            <h1 class="display-3 fw-bold">Tenemos todo al alcance de tu manos</h1>
+                            <p class="lead">Todo para tu hogar</p>
+                            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success btn-lg mt-3">Explorar Catálogo</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <!-- Slide 2 -->
+            <li class="splide__slide">
+                <img src="{% static 'img/fondo5.png' %}" class="hero-slide-img" alt="Frente de la ferretería">
+                <div class="splide-caption">
+                    <div class="container text-white">
+                        <div class="col-lg-8">
+                            <h1 class="display-3 fw-bold">Calidad y Durabilidad</h1>
+                            <p class="lead">Las mejores marcas en herramientas para profesionales y aficionados.</p>
+                            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success btn-lg mt-3">Ver catálogo</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <!-- Slide 3 -->
+            <li class="splide__slide">
+                <img src="{% static 'img/dentro.jpg' %}" class="hero-slide-img" alt="Interior de la ferretería">
+                <div class="splide-caption">
+                    <div class="container text-white">
+                        <div class="col-lg-8">
+                            <h1 class="display-3 fw-bold">Pregunta por nuestras marcas</h1>
+                            <p class="lead">Amplia variedad de marcas disponibles.</p>
+                            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success btn-lg mt-3">Ir al Catálogo</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!-- =========================
+Estilos para el Carrusel con Splide.js
+============================== -->
+<style>
+    .hero-splide {
+        width: 100%;
+        height: 450px;
+    }
+    .splide__slide {
+        background: #000;
+        overflow: hidden;
+        position: relative; /* Necesario para posicionar el overlay */
+    }
+    /* --- NUEVO: El overlay semitransparente --- */
+    .splide__slide::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Overlay negro al 50% de opacidad */
+        z-index: 1; /* Se asegura que esté sobre la imagen */
+    }
+    .hero-slide-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* La imagen queda detrás del overlay */
+    }
+    .splide-caption {
+        position: absolute;
+        left: 0;
+        top: 0; /* <-- AÑADIDO: Anclamos a la parte superior */
+        right: 0;
+        bottom: 0; /* Esto asegura que ocupe toda la altura */
+        display: flex;
+        align-items: center; 
+        justify-content: flex-start;
+        z-index: 2;
+        padding-bottom: 0;
+        text-align: left;
+    }
+    /* --- NUEVOS ESTILOS DE FUENTE --- */
+    .splide-caption h1 {
+        font-family: 'Poppins', sans-serif;
+    }
+    .splide-caption p {
+        font-family: 'Lato', sans-serif;
+    }
+    /* --------------------------------- */
+    .splide-caption h1, .splide-caption p, .splide-caption .btn {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .splide__slide.is-active .splide-caption h1 { transition-delay: 0.3s; }
+    .splide__slide.is-active .splide-caption p { transition-delay: 0.5s; }
+    .splide__slide.is-active .splide-caption .btn { transition-delay: 0.7s; }
+    .splide__slide.is-active .splide-caption h1,
+    .splide__slide.is-active .splide-caption p,
+    .splide__slide.is-active .splide-caption .btn {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* Estilos para los controles de Splide */
+    .splide__arrow {
+        background: rgba(0, 0, 0, 0.3);
+    }
+    .splide__arrow svg {
+        fill: #ffffff;
+    }
+    .splide__pagination__page.is-active {
+        background: #ffffff;
+    }
+</style>
 <div class="container">
     <!-- =========================
     Barra de Búsqueda
@@ -125,6 +244,31 @@ document.addEventListener('DOMContentLoaded', function() {
             suggestionsBox.style.display = 'none';
         }
     });
+});
+</script>
+<!-- **NUEVO:** JS de Splide.js. Idealmente, esto iría justo antes de cerrar el </body> en tu 'base.html' -->
+<script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
+<!-- Inicialización de Splide -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    new Splide('.hero-splide', {
+        type: 'fade', // Efecto de desvanecimiento
+        rewind: true, // Vuelve al inicio al terminar
+        height: '450px',
+        // Autoplay
+        autoplay: true,
+        interval: 5000, // 5 segundos
+        pauseOnHover: false,
+        // Opciones de accesibilidad
+        i18n: {
+            prev: 'Diapositiva anterior',
+            next: 'Diapositiva siguiente',
+            first: 'Ir a la primera diapositiva',
+            last: 'Ir a la última diapositiva',
+        },
+        loop: true,
+    }).mount();
 });
 </script>
 
