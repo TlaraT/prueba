@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Inicio - Ferre Hogar Chuchin{% endblock %}
+{% block title %}Inicio | Ferre Hogar Chuchin{% endblock %}
+
+{% block meta_description %}
+Bienvenido a Ferre Hogar Chuchin. Descubre nuestro amplio catálogo de herramientas, refacciones y todo lo que necesitas para tu hogar. Calidad y servicio garantizados.
+{% endblock %}
 
 {% block content %}
 <!-- =========================
@@ -166,7 +170,12 @@ Estilos para el Carrusel con Splide.js
     ============================== -->
     {% for data in datos_por_categoria %}
     <div class="mb-5">
-        <h2 class="pb-2 border-bottom">{{ data.categoria.nombre }}</h2>
+        <!-- Título de categoría con botón "Ver todo" -->
+        <div class="pb-2 border-bottom">
+            <a href="{% url 'catalogo:categoria_detalle' data.categoria.id %}" class="btn btn-success btn-lg w-100 text-start">
+                <h2 class="mb-0 h4 d-inline">{{ data.categoria.nombre }}</h2>
+            </a>
+        </div>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 mt-2">
             {% for producto in data.productos %}
             <div class="col">

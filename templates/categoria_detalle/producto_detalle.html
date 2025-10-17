@@ -1,7 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ producto.nombre }}{% endblock %}
+{% block title %}{{ producto.nombre }} | Ferre Hogar Chuchin{% endblock %}
+
+{% block meta_description %}
+Compra "{{ producto.nombre }}". {{ producto.descripcion|truncatewords:20 }}. Encuentra las mejores refacciones y herramientas en Ferre Hogar Chuchin.
+{% endblock %}
+
+{% block extra_styles %}
+<!-- =====================================================
+DATOS ESTRUCTURADOS (SCHEMA.ORG) PARA SEO
+Esto ayuda a Google a entender el producto y mostrar resultados enriquecidos.
+====================================================== -->
+<script type="application/ld+json">
+{{ json_ld_data|safe }}
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="container my-5">

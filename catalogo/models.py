@@ -53,6 +53,11 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
     
+    # --- MÉTODO AÑADIDO PARA URL CANÓNICA ---
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('catalogo:producto_detalle', args=[str(self.id)])
+
     # --- MÉTODO SAVE MODIFICADO PARA CONVERTIR IMÁGENES A WEBP ---
     def save(self, *args, **kwargs):
         # Primero, verificamos si el objeto ya existe en la BD para comparar la imagen.

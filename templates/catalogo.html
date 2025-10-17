@@ -3,11 +3,19 @@
 {% load static %}
 
 {% block title %}
-    {% if is_search_results %}
-        Resultados para "{{ query }}"
-    {% else %}
-        Catálogo de Productos
-    {% endif %}
+{% if is_search_results %}
+Resultados para "{{ query }}" | Ferre Hogar Chuchin
+{% else %}
+Catálogo de Productos | Ferre Hogar Chuchin
+{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+{% if is_search_results %}
+Encuentra productos que coinciden con tu búsqueda: "{{ query }}". Los mejores precios en herramientas y refacciones.
+{% else %}
+Explora todas las categorías y productos de Ferre Hogar Chuchin. Desde plomería hasta herramientas eléctricas, tenemos lo que buscas.
+{% endif %}
 {% endblock %}
 
 {% block content %}

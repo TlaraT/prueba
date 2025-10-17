@@ -107,14 +107,43 @@ def categoria_detalle(request, categoria_id):
     }
     return render(request, 'categoria_detalle/categoria_detalle.html', context)
 
+import json
+from django.utils.safestring import mark_safe
+from datetime import datetime
+
 def producto_detalle(request, producto_id):
     # Usamos prefetch_related para cargar eficientemente los accesorios y los productos principales
     # en una sola consulta adicional, evitando el problema N+1.
     producto = get_object_or_404(
         Producto.objects.prefetch_related('accesorios', 'producto_principal'), 
         id=producto_id)
+
+    # --- LÓGICA PARA DATOS ESTRUCTURADOS (JSON-LD) ---
+    # Construimos el diccionario de datos aquí en Python.
+    json_ld_data = {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": producto.nombre,
+        "description": producto.descripcion or "", # Aseguramos que no sea None
+        "sku": producto.id,
+        "offers": {
+            "@type": "Offer",
+            "url": request.build_absolute_uri(producto.get_absolute_url()),
+            "priceCurrency": "MXN",
+            "price": str(producto.precio), # Convertimos a string para JSON
+            "priceValidUntil": f"{datetime.now().year + 1}-12-31",
+            "availability": "https://schema.org/InStock" if producto.stock > 0 else "https://schema.org/OutOfStock",
+            "itemCondition": "https://schema.org/NewCondition"
+        }
+    }
+    # Añadimos la imagen solo si existe, para evitar errores.
+    if producto.imagen and hasattr(producto.imagen, 'url'):
+        json_ld_data['image'] = request.build_absolute_uri(producto.imagen.url)
+
     context = {
-        'producto': producto
+        'producto': producto,
+        # Convertimos el diccionario a JSON y lo marcamos como seguro para la plantilla.
+        'json_ld_data': mark_safe(json.dumps(json_ld_data, ensure_ascii=False))
     }
     return render(request, 'categoria_detalle/producto_detalle.html', context)
     
