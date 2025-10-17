@@ -25,7 +25,13 @@ def inicio(request):
             'productos': productos
         })
 
-    context = {'datos_por_categoria': datos_por_categoria}
+    # --- NUEVO: Novedades (últimos 8 productos añadidos) ---
+    productos_novedades = Producto.objects.order_by('-id')[:8]
+
+    # --- NUEVO: Productos en Stock (últimos 8 productos con stock) ---
+    productos_en_stock_inicio = Producto.objects.filter(stock__gt=0).order_by('-id')[:8]
+
+    context = {'datos_por_categoria': datos_por_categoria, 'productos_novedades': productos_novedades, 'productos_en_stock_inicio': productos_en_stock_inicio}
     return render(request, 'inicio.html', context)
 
 def catalogo(request):
