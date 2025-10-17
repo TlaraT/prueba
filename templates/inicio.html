@@ -7,6 +7,9 @@
 Bienvenido a Ferre Hogar Chuchin. Descubre nuestro amplio catálogo de herramientas, refacciones y todo lo que necesitas para tu hogar. Calidad y servicio garantizados.
 {% endblock %}
 
+{% block body_class %}
+{% endblock %}
+
 {% block content %}
 <!-- =========================
 Sección Hero (Banner Principal)
@@ -25,12 +28,12 @@ Sección Hero (Banner Principal)
             <!-- Slide 1 -->
             <li class="splide__slide">
                 <img src="{% static 'img/AMARILLO2.png' %}" class="hero-slide-img" alt="Herramientas variadas">
-                <div class="splide-caption">
+                <div class="splide-caption splide-caption-center">
                     <div class="container text-white">
                         <div class="col-lg-8">
-                            <h1 class="display-3 fw-bold">Tenemos todo al alcance de tu manos</h1>
-                            <p class="lead">Todo para tu hogar</p>
-                            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success btn-lg mt-3">Explorar Catálogo</a>
+                            <h1 class="display-3 fw-bold">¿Necesitas Asesoría?</h1>
+                            <p class="lead">Estamos listos para ayudarte a encontrar la refacción o herramienta perfecta.</p>
+                            <a href="https://wa.me/522291883340?text=Hola,%20necesito%20asesoría%20con%20un%20producto." target="_blank" class="btn btn-success btn-lg mt-3"><i class="bi bi-whatsapp me-2"></i>Contacta con nosotros</a>
                         </div>
                     </div>
                 </div>
@@ -115,12 +118,18 @@ Estilos para el Carrusel con Splide.js
         right: 0;
         bottom: 0; /* Esto asegura que ocupe toda la altura */
         display: flex;
-        /* --- MODIFICADO: Centrar el contenido vertical y horizontalmente --- */
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start; /* Alineación por defecto a la izquierda */
         z-index: 2;
         padding-bottom: 0;
-        text-align: center; /* Centramos el texto dentro de su contenedor */
+        text-align: left; /* Alineación de texto por defecto a la izquierda */
+    }
+
+    /* --- NUEVO: Clase específica para centrar el contenido --- */
+    .splide-caption-center {
+        justify-content: center;
+        text-align: center;
+    }
         /* ------------------------------------------------------------------ */
     }
     /* --- NUEVOS ESTILOS DE FUENTE --- */
