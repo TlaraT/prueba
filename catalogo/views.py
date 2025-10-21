@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.urls import reverse
 from collections import defaultdict
+from django.templatetags.static import static as static_url
 
 def inicio(request):
     # --- VISTA OPTIMIZADA ---
@@ -168,11 +169,17 @@ def search_suggestions(request):
     term = request.GET.get('term', '').strip()
     suggestions = []
     if len(term) >= 2: # Empezar a buscar a partir de 2 caracteres
+        # Obtenemos la URL de la imagen de marcador de posición una sola vez
+        placeholder_url = request.build_absolute_uri(static_url('img/placeholder.png'))
         productos = Producto.objects.filter(nombre__icontains=term)[:10] # Limitar a 10 resultados
         for producto in productos:
+            # Obtenemos la URL de la imagen del producto o el marcador de posición
+            image_url = request.build_absolute_uri(producto.imagen.url) if producto.imagen and hasattr(producto.imagen, 'url') else placeholder_url
+            
             suggestions.append({
                 'label': producto.nombre,
-                'url': reverse('catalogo:producto_detalle', args=[producto.id])
+                'url': reverse('catalogo:producto_detalle', args=[producto.id]),
+                'image_url': image_url # <-- AÑADIMOS LA URL DE LA IMAGEN
             })
     
     return JsonResponse(suggestions, safe=False)
