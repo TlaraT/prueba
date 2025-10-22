@@ -60,6 +60,14 @@ class Producto(models.Model):
 
     # --- MÉTODO SAVE MODIFICADO PARA CONVERTIR IMÁGENES A WEBP ---
     def save(self, *args, **kwargs):
+        # --- NUEVA LÓGICA PARA EVITAR DUPLICADOS EN IMPORTACIÓN ---
+        # Si el campo 'imagen' tiene un valor y no es un archivo subido (es decir, es una cadena de texto
+        # de la importación), y ya es un archivo .webp, no hacemos nada y guardamos directamente.
+        # Esto evita que el proceso de conversión se ejecute sobre imágenes que ya están en el servidor.
+        if self.imagen and not hasattr(self.imagen.file, 'content_type') and str(self.imagen.name).endswith('.webp'):
+            super().save(*args, **kwargs)
+            return
+
         # Primero, verificamos si el objeto ya existe en la BD para comparar la imagen.
         if self.pk:
             try:
