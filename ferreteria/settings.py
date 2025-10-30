@@ -65,6 +65,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # --- NUESTRO CONTEXT PROCESSOR PERSONALIZADO ---
+                'catalogo.context_processors.global_context',
             ],
         },
     },
@@ -138,3 +140,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+
+# --- CONFIGURACIONES PERSONALIZADAS DEL PROYECTO ---
+# Aquí centralizamos valores que antes estaban "hardcodeados" en el código.
+
+# Datos de contacto del negocio
+CONTACTO_WHATSAPP = "522291883340"
+CONTACTO_EMAIL = "ferrehogarchuchin@gmail.com"
+
+# Paginación y visualización
+PRODUCTOS_POR_PAGINA = 12
+PRODUCTOS_NOVEDADES_INICIO = 8
+PRODUCTOS_EN_STOCK_INICIO = 8
+SUGERENCIAS_BUSQUEDA_MAX = 10
+SUGERENCIAS_BUSQUEDA_MIN_CHARS = 2

@@ -103,7 +103,7 @@ Esto ayuda a Google a entender el producto y mostrar resultados enriquecidos.
                     <i class="bi bi-arrow-left"></i> Volver
                 </a>
                 <!-- Opcional: Botón para contactar por WhatsApp -->
-                <a href="https://wa.me/522291883340?text=Hola,%20me%20interesa%20el%20producto:%20{{ producto.nombre }}" target="_blank" class="btn btn-success">
+                <a href="https://wa.me/{{ CONTACTO_WHATSAPP }}?text=Hola,%20me%20interesa%20el%20producto:%20{{ producto.nombre|urlencode }}" target="_blank" class="btn btn-success">
                     <i class="bi bi-whatsapp"></i> Consultar por WhatsApp
                 </a>
             </div>

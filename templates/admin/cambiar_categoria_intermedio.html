@@ -1,0 +1,32 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block content %}
+<div id="content-main">
+    <form action="" method="post">
+        {% csrf_token %}
+        
+        <h2>{{ title }}</h2>
+
+        <p>Has seleccionado los siguientes productos para cambiar su categoría:</p>
+        
+        <ul>
+        {% for obj in queryset %}
+            <li>{{ obj.nombre }} (Categoría actual: {{ obj.categoria.nombre|default:"Sin categoría" }})</li>
+        {% endfor %}
+        </ul>
+
+        <fieldset class="module aligned">
+            <div class="form-row">
+                {{ form.categoria.label_tag }} {{ form.categoria }}
+            </div>
+        </fieldset>
+
+        {% for obj in queryset %}
+            <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk }}" />
+        {% endfor %}
+        <input type="hidden" name="action" value="cambiar_categoria" />
+        <input type="submit" name="apply" value="Aplicar cambio" class="default" />
+    </form>
+</div>
+{% endblock %}

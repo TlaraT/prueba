@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from collections import defaultdict
 from django.templatetags.static import static as static_url
+from django.conf import settings # <-- IMPORTAMOS SETTINGS
 
 def inicio(request):
     # --- VISTA OPTIMIZADA ---
@@ -27,10 +28,10 @@ def inicio(request):
         })
 
     # --- NUEVO: Novedades (últimos 8 productos añadidos) ---
-    productos_novedades = Producto.objects.order_by('-id')[:8]
+    productos_novedades = Producto.objects.order_by('-id')[:settings.PRODUCTOS_NOVEDADES_INICIO]
 
     # --- NUEVO: Productos en Stock (últimos 8 productos con stock) ---
-    productos_en_stock_inicio = Producto.objects.filter(stock__gt=0).order_by('-id')[:8]
+    productos_en_stock_inicio = Producto.objects.filter(stock__gt=0).order_by('-id')[:settings.PRODUCTOS_EN_STOCK_INICIO]
 
     context = {'datos_por_categoria': datos_por_categoria, 'productos_novedades': productos_novedades, 'productos_en_stock_inicio': productos_en_stock_inicio}
     return render(request, 'inicio.html', context)
@@ -44,7 +45,7 @@ def catalogo(request):
         # Si hay un 'query', buscamos en todos los productos
         productos_list = Producto.objects.filter(nombre__icontains=query).order_by('nombre')
         
-        paginator = Paginator(productos_list, 12) 
+        paginator = Paginator(productos_list, settings.PRODUCTOS_POR_PAGINA) 
         page_number = request.GET.get('page')
         productos_pagina = paginator.get_page(page_number)
 
@@ -81,7 +82,7 @@ def catalogo(request):
             })
 
         # Obtenemos algunos productos con stock para mostrar (los 8 más recientes)
-        productos_en_stock = Producto.objects.filter(stock__gt=0).order_by('-id')[:8]
+        productos_en_stock = Producto.objects.filter(stock__gt=0).order_by('-id')[:settings.PRODUCTOS_EN_STOCK_INICIO]
 
         context = {
             'is_search_results': False, 
@@ -103,7 +104,7 @@ def categoria_detalle(request, categoria_id):
     if query:
         productos_list = productos_list.filter(nombre__icontains=query)
 
-    paginator = Paginator(productos_list, 12) 
+    paginator = Paginator(productos_list, settings.PRODUCTOS_POR_PAGINA) 
     page_number = request.GET.get('page')
     productos_pagina = paginator.get_page(page_number)
 
@@ -136,7 +137,7 @@ def producto_detalle(request, producto_id):
         "offers": {
             "@type": "Offer",
             "url": request.build_absolute_uri(producto.get_absolute_url()),
-            "priceCurrency": "MXN",
+            "priceCurrency": "MXN", # Este es un buen candidato para settings si planeas vender en otras monedas
             "price": str(producto.precio), # Convertimos a string para JSON
             "priceValidUntil": f"{datetime.now().year + 1}-12-31",
             "availability": "https://schema.org/InStock" if producto.stock > 0 else "https://schema.org/OutOfStock",
@@ -168,10 +169,10 @@ def search_suggestions(request):
     """
     term = request.GET.get('term', '').strip()
     suggestions = []
-    if len(term) >= 2: # Empezar a buscar a partir de 2 caracteres
+    if len(term) >= settings.SUGERENCIAS_BUSQUEDA_MIN_CHARS: # Usamos el valor de settings
         # Obtenemos la URL de la imagen de marcador de posición una sola vez
         placeholder_url = request.build_absolute_uri(static_url('img/placeholder.png'))
-        productos = Producto.objects.filter(nombre__icontains=term)[:10] # Limitar a 10 resultados
+        productos = Producto.objects.filter(nombre__icontains=term)[:settings.SUGERENCIAS_BUSQUEDA_MAX] # Usamos el valor de settings
         for producto in productos:
             # Obtenemos la URL de la imagen del producto o el marcador de posición
             image_url = request.build_absolute_uri(producto.imagen.url) if producto.imagen and hasattr(producto.imagen, 'url') else placeholder_url

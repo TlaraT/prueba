@@ -1,5 +1,7 @@
 #catalogo/admin.py
 from django.contrib import admin
+from django.shortcuts import render # <-- NUEVA IMPORTACIÓN
+from django import forms
 from .models import Categoria, Producto, Empleado
 from import_export import resources
 from import_export.fields import Field
@@ -81,6 +83,11 @@ class ProductoResource(resources.ModelResource):
         report_skipped = False
         create_missing_fk = True
 
+# --- NUEVO: Formulario para la acción de cambiar categoría ---
+class CambiarCategoriaForm(forms.Form):
+    # Campo para seleccionar la nueva categoría. Usamos ModelChoiceField para que se muestre como un <select>.
+    categoria = forms.ModelChoiceField(queryset=Categoria.objects.all(), label="Seleccionar nueva categoría")
+
 class ProductoAdmin(ImportExportModelAdmin):
     filter_horizontal = ('accesorios',)
     resource_class = ProductoResource
@@ -90,6 +97,37 @@ class ProductoAdmin(ImportExportModelAdmin):
     ordering = ('nombre',)
     list_editable = ('precio', 'stock', 'es_mas_vendido')
     save_on_top = True
+    actions = ['cambiar_categoria'] # <-- AÑADIMOS LA NUEVA ACCIÓN
+
+    # --- NUEVA ACCIÓN PARA CAMBIAR CATEGORÍA EN LOTE ---
+    def cambiar_categoria(self, request, queryset):
+        """
+        Acción de administrador para cambiar la categoría de múltiples productos seleccionados.
+        """
+        if 'apply' in request.POST:
+            # El usuario ha enviado el formulario con la nueva categoría
+            form = CambiarCategoriaForm(request.POST)
+            if form.is_valid():
+                nueva_categoria = form.cleaned_data['categoria']
+                updated_count = queryset.update(categoria=nueva_categoria)
+                self.message_user(request, f'{updated_count} productos han sido actualizados a la categoría "{nueva_categoria}".')
+                return
+
+        # Muestra la página intermedia para seleccionar la categoría.
+        # Usamos django.shortcuts.render para renderizar la plantilla.
+        form = CambiarCategoriaForm()
+        return render(
+            request,
+            'admin/cambiar_categoria_intermedio.html',
+            context={
+                'title': 'Cambiar categoría de productos',
+                'queryset': queryset,
+                'opts': self.model._meta,
+                'form': form, # Pasamos el objeto form directamente
+                'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
+            },
+        )
+    cambiar_categoria.short_description = "Cambiar categoría de productos seleccionados"
     
 
 # --- PERSONALIZACIÓN DEL SITIO DE ADMINISTRACIÓN ---
