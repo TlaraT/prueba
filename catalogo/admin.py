@@ -135,7 +135,17 @@ admin.site.site_header = "Administración de Ferre Hogar Chuchin"
 admin.site.site_title = "Portal de Administración"
 admin.site.index_title = "Bienvenido al portal de gestión"
 
+# --- NUEVO: Personalización del admin para Categorías ---
+class CategoriaAdmin(admin.ModelAdmin):
+    """
+    Mejora la interfaz de administración para las categorías.
+    """
+    list_display = ('nombre', 'parent') # Muestra la categoría padre en la lista
+    list_filter = ('parent',) # Permite filtrar por categoría padre
+    search_fields = ('nombre', 'parent__nombre') # Permite buscar por nombre o nombre del padre
+    ordering = ('nombre',)
+
 
 # 3. Registros: Activamos todo en el panel de admin.
-admin.site.register(Categoria)
+admin.site.register(Categoria, CategoriaAdmin) # Usamos la nueva clase personalizada
 admin.site.register(Producto, ProductoAdmin)

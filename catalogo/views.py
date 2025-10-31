@@ -93,25 +93,55 @@ def catalogo(request):
 
 def categoria_detalle(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
-    
+
+    # 1. Obtenemos todas las subcategorías directas de la categoría actual.
+    subcategorias = categoria.subcategorias.all().order_by('nombre')
+
     # Obtenemos el término de búsqueda de la URL, si existe
     query = request.GET.get('q')
     
-    # Empezamos con todos los productos de la categoría
-    productos_list = Producto.objects.filter(categoria=categoria).order_by('nombre')
+    # --- LÓGICA MEJORADA: PREPARAMOS DATOS PARA AMBOS CASOS ---
+    productos_pagina = []
+    datos_subcategorias = []
+
+    if subcategorias.exists():
+        # --- CASO 1: LA CATEGORÍA TIENE SUBCATEGORÍAS ---
+        # Buscamos una imagen representativa para cada subcategoría.
+        
+        # 1. Obtenemos todos los productos con imagen que pertenecen a nuestras subcategorías.
+        productos_con_imagen = Producto.objects.filter(
+            categoria__in=subcategorias, 
+            imagen__isnull=False
+        ).order_by('categoria_id', 'id')
+
+        # 2. Creamos un mapa para guardar solo la imagen del primer producto de cada subcategoría.
+        mapa_imagenes_subcat = {}
+        for producto in productos_con_imagen:
+            if producto.categoria_id not in mapa_imagenes_subcat:
+                mapa_imagenes_subcat[producto.categoria_id] = producto.imagen
+
+        # 3. Construimos la lista final para la plantilla.
+        for subcat in subcategorias:
+            datos_subcategorias.append({
+                'categoria': subcat,
+                'imagen_representativa': mapa_imagenes_subcat.get(subcat.id)
+            })
+    else:
+        # --- CASO 2: LA CATEGORÍA NO TIENE SUBCATEGORÍAS (MOSTRAMOS PRODUCTOS) ---
+        productos_list = Producto.objects.filter(categoria=categoria).order_by('nombre')
+        
+        if query:
+            productos_list = productos_list.filter(nombre__icontains=query)
+
+        paginator = Paginator(productos_list, settings.PRODUCTOS_POR_PAGINA) 
+        page_number = request.GET.get('page')
+        productos_pagina = paginator.get_page(page_number)
     
-    # Si hay un término de búsqueda, filtramos la lista
-    if query:
-        productos_list = productos_list.filter(nombre__icontains=query)
-
-    paginator = Paginator(productos_list, settings.PRODUCTOS_POR_PAGINA) 
-    page_number = request.GET.get('page')
-    productos_pagina = paginator.get_page(page_number)
-
     context = {
         'categoria': categoria,
+        'datos_subcategorias': datos_subcategorias, # <-- Nueva estructura con imágenes
         'productos': productos_pagina,
-        'query': query, # Enviamos la búsqueda de vuelta a la plantilla
+        'query': query,
     }
     return render(request, 'categoria_detalle/categoria_detalle.html', context)
 

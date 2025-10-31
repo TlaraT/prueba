@@ -25,9 +25,27 @@ class Empleado(models.Model):
 
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
+    # --- NUEVO CAMPO PARA SUBCATEGORÍAS ---
+    # Este campo permite que una categoría tenga una "Categoría Padre".
+    # Si es nulo, es una categoría principal.
+    parent = models.ForeignKey(
+        'self', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
+        related_name='subcategorias',
+        verbose_name='Categoría Padre'
+    )
+
+    class Meta:
+        # Ordena las categorías alfabéticamente para una mejor visualización en el admin.
+        ordering = ('nombre',)
+        verbose_name = 'Categoría'
+        verbose_name_plural = 'Categorías'
 
     def __str__(self):
-        return self.nombre
+        # Mejora la visualización en el admin para mostrar la jerarquía. Ej: "Mezcladoras > De Baño"
+        return f"{self.parent.nombre} > {self.nombre}" if self.parent else self.nombre
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=800)
