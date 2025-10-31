@@ -134,8 +134,8 @@ Explora todas las categorías y productos de Ferre Hogar Chuchin. Desde plomerí
                     <div class="col">
                         <a href="{% url 'catalogo:categoria_detalle' item.categoria.id %}" class="text-decoration-none text-dark">
                             <div class="card h-100 shadow-sm category-card">
-                                {% if item.primer_producto and item.primer_producto.imagen %}
-                                    <img src="{{ item.primer_producto.imagen.url }}" class="card-img-top-custom" alt="Imagen de {{ item.categoria.nombre }}" loading="lazy" decoding="async">
+                                {% if item.producto_portada and item.producto_portada.imagen and item.producto_portada.imagen.url %}
+                                    <img src="{{ item.producto_portada.imagen.url }}" class="card-img-top-custom" alt="Imagen de {{ item.categoria.nombre }}" loading="lazy" decoding="async">
                                 {% else %}
                                     <img src="{% static 'img/placeholder.png' %}" class="card-img-top-custom" alt="Imagen no disponible" style="filter: grayscale(80%);" loading="lazy" decoding="async">
                                 {% endif %}

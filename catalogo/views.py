@@ -58,27 +58,40 @@ def catalogo(request):
     
     else:
         # --- LÓGICA DE CATEGORÍAS (si no hay búsqueda) ---
-        # --- LÓGICA DE CATEGORÍAS OPTIMIZADA para evitar el problema N+1 ---
-        categorias = Categoria.objects.all().order_by('nombre')
+        # --- LÓGICA CORREGIDA Y SIMPLIFICADA PARA BUSCAR IMÁGENES DE PORTADA ---
         
-        # 1. Obtenemos todos los productos con imagen, ordenados por categoría, en una sola consulta.
-        productos_con_imagen = Producto.objects.filter(
-            categoria__in=categorias, 
-            imagen__isnull=False
-        ).order_by('categoria_id', 'id')
+        # 1. Obtenemos solo las categorías principales (las que no tienen padre).
+        categorias_principales = Categoria.objects.filter(parent__isnull=True).order_by('nombre')
+        #    Usamos prefetch_related para cargar todas las subcategorías de una vez y evitar
+        #    múltiples consultas a la base de datos dentro del bucle.
+        categorias_principales = categorias_principales.prefetch_related('subcategorias')
 
-        # 2. Creamos un mapa para guardar solo el primer producto de cada categoría (sin más consultas).
-        mapa_primer_producto = {}
-        for producto in productos_con_imagen:
-            if producto.categoria_id not in mapa_primer_producto:
-                mapa_primer_producto[producto.categoria_id] = producto
-
-        # 3. Construimos la lista final usando el mapa, de forma súper rápida.
+        # 2. Construimos la lista de datos para la plantilla.
         datos_categorias = []
-        for categoria in categorias:
+        for categoria in categorias_principales:
+            # --- LÓGICA DE BÚSQUEDA DE IMAGEN CON PRIORIDAD ---
+            
+            # Prioridad 1: Buscar un producto con imagen directamente en la categoría principal.
+            primer_producto_con_imagen = Producto.objects.filter(
+                categoria=categoria,
+                imagen__isnull=False
+            ).first()
+            
+            # Prioridad 2: Si no se encontró, buscar en todas las subcategorías.
+            if not primer_producto_con_imagen:
+                # Obtenemos los IDs de todas las subcategorías de esta categoría principal.
+                ids_subcategorias = [sub.id for sub in categoria.subcategorias.all()]
+                if ids_subcategorias:
+                    primer_producto_con_imagen = Producto.objects.filter(
+                        categoria_id__in=ids_subcategorias,
+                        imagen__isnull=False
+                    ).first()
+
             datos_categorias.append({
                 'categoria': categoria,
-                'primer_producto': mapa_primer_producto.get(categoria.id)
+                # Pasamos el producto entero. La plantilla se encargará de acceder a la imagen.
+                # --- CORRECCIÓN: Usamos el nombre 'producto_portada' que la plantilla espera ---
+                'producto_portada': primer_producto_con_imagen
             })
 
         # Obtenemos algunos productos con stock para mostrar (los 8 más recientes)

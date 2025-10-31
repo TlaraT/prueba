@@ -10,6 +10,7 @@ import os
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.text import slugify
+from django.db.models import Q # <-- NUEVA IMPORTACIÓN
 from django.conf import settings
 
 class Empleado(models.Model):
@@ -24,7 +25,8 @@ class Empleado(models.Model):
         return self.nombre
 
 class Categoria(models.Model):
-    nombre = models.CharField(max_length=100, unique=True)
+    # --- CAMBIO CLAVE: Quitamos unique=True de aquí ---
+    nombre = models.CharField(max_length=100)
     # --- NUEVO CAMPO PARA SUBCATEGORÍAS ---
     # Este campo permite que una categoría tenga una "Categoría Padre".
     # Si es nulo, es una categoría principal.
@@ -42,6 +44,18 @@ class Categoria(models.Model):
         ordering = ('nombre',)
         verbose_name = 'Categoría'
         verbose_name_plural = 'Categorías'
+        # --- NUEVA REGLA DE UNICIDAD ---
+        # Esto reemplaza el 'unique=True' del campo 'nombre'.
+        constraints = [
+            # 1. Una subcategoría debe ser única dentro de su padre.
+            #    Permite: (Herramientas > Industrial) y (Estufas > Industrial)
+            #    Prohíbe: (Herramientas > Industrial) y (Herramientas > Industrial)
+            models.UniqueConstraint(fields=['parent', 'nombre'], name='unique_subcategory_name'),
+            # 2. Una categoría principal (sin padre) debe tener un nombre único.
+            #    Permite: (Herramientas) y (Estufas)
+            #    Prohíbe: (Herramientas) y (Herramientas)
+            models.UniqueConstraint(fields=['nombre'], condition=Q(parent__isnull=True), name='unique_toplevel_category_name')
+        ]
 
     def __str__(self):
         # Mejora la visualización en el admin para mostrar la jerarquía. Ej: "Mezcladoras > De Baño"
